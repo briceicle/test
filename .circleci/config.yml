@@ -1,0 +1,33 @@
+version: 2.1
+
+# The lein image needed for most things.
+docker_image: &docker_image
+  image: circleci/node:16.13.1
+jobs:
+  check_syntax:
+    docker:
+      - *docker_image
+    steps:
+      - run: echo "this is the check_syntax job"
+  echo:
+    docker:
+      - *docker_image
+    steps:
+      - run: echo "this is the echo job"
+
+
+workflows:
+  version: 2
+            
+  main:
+    jobs:
+      - check_syntax
+      - hold:
+          type: approval
+          requires:
+            - check_syntax
+      - echo:
+          context: test-restricted-context
+          requires:
+            - check_syntax
+            - hold
